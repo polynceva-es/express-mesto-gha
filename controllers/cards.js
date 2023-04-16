@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const http2 = require('node:http2');
 const Card = require('../models/card');
 
-const { HTTP_STATUS_CREATED, HTTP_STATUS_BAD_REQUEST, HTTP_STATUS_NOT_FOUND} = http2.constants;
+const { HTTP_STATUS_CREATED, HTTP_STATUS_BAD_REQUEST, HTTP_STATUS_NOT_FOUND } = http2.constants;
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
