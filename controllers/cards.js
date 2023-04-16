@@ -35,7 +35,7 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findOneAndRemove({owner: owner, _id: cardId})
     .then((card)=>{
       if(card) {
-        res.send({})
+        res.send({message: "Пост удалён"})
       } else {
         res.status(HTTP_STATUS_NOT_FOUND).send({message: `Карточка с указанным id:${cardId} не найдена`});
       }
