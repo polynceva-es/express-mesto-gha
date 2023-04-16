@@ -30,5 +30,6 @@ app.use('*', (req, res) => { res.status(HTTP_STATUS_NOT_FOUND).send({ message: '
 app.use(errorHandler);
 
 app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
   console.log(`App listening on port ${PORT}`);
 });
