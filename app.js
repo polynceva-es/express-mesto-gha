@@ -27,7 +27,7 @@ app.use((req, res, next) => {
 })
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
-app.get('*', (req, res)=> {res.status(HTTP_STATUS_NOT_FOUND).send({message: 'Страница не найдена'})})ж
+app.get('*', (req, res)=> {res.status(HTTP_STATUS_NOT_FOUND).send({message: 'Страница не найдена'})});
 app.use(errorHandler);
 
 app.listen(PORT, ()=> {
