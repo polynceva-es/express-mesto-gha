@@ -35,7 +35,7 @@ module.exports.getUserId = (req, res, next) => {
     })
     .catch(err => {
       if(err instanceof mongoose.Error.CastError) {
-        res.status(HTTP_STATUS_NOT_FOUND).send({message: `Пользователь по указанному id:${userId} не найден`});
+        res.status(HTTP_STATUS_BAD_REQUEST).send({message: `Пользователь по указанному id:${userId} не найден`});
       } else {next(err)}
 });
 };
@@ -56,7 +56,7 @@ module.exports.updateUserInfo = (req, res, next) => {
         res.status(HTTP_STATUS_BAD_REQUEST).send({message: 'Переданы некорректные данные при обновлении профиля'});
       }
       if(err instanceof mongoose.Error.CastError) {
-        res.status(HTTP_STATUS_NOT_FOUND).send({message: `Пользователь по указанному id:${id} не найден`});
+        res.status(HTTP_STATUS_BAD_REQUEST).send({message: `Пользователь по указанному id:${id} не найден`});
       }
       else {next(err)}
     })
@@ -78,7 +78,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
         res.status(HTTP_STATUS_BAD_REQUEST).send({message: 'Переданы некорректные данные при обновлении аватара'});
       }
       if(err instanceof mongoose.Error.CastError) {
-        res.status(HTTP_STATUS_NOT_FOUND).send({message: `Пользователь по указанному id:${id} не найден`});
+        res.status(HTTP_STATUS_BAD_REQUEST).send({message: `Пользователь по указанному id:${id} не найден`});
       }
       else {next(err)}
     })

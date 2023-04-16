@@ -35,14 +35,14 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findOneAndRemove({owner: owner, _id: cardId})
     .then((card)=>{
       if(card) {
-        res.send()
+        res.send({})
       } else {
         res.status(HTTP_STATUS_NOT_FOUND).send({message: `Карточка с указанным id:${cardId} не найдена`});
       }
     })
     .catch(err => {
       if(err instanceof mongoose.Error.CastError) {
-        res.status(HTTP_STATUS_NOT_FOUND).send({message: `Карточка с указанным id:${cardId} не найдена`});
+        res.status(HTTP_STATUS_BAD_REQUEST).send({message: `Карточка с указанным id:${cardId} не найдена`});
     } else {next(err)}})
 };
 
@@ -61,7 +61,7 @@ module.exports.putCardLike = (req, res, next) => {
     })
     .catch(err => {
       if(err instanceof mongoose.Error.CastError) {
-        res.status(HTTP_STATUS_NOT_FOUND).send({message: `Карточка с указанным id:${cardId} не найдена`});
+        res.status(HTTP_STATUS_BAD_REQUEST).send({message: `Карточка с указанным id:${cardId} не найдена`});
       } else {next(err)}
     })
 };
@@ -81,7 +81,7 @@ module.exports.deleteCardLike = (req, res, next) => {
   })
   .catch(err => {
     if(err instanceof mongoose.Error.CastError) {
-      res.status(HTTP_STATUS_NOT_FOUND).send({message: `Карточка с указанным id:${cardId} не найдена`});
+      res.status(HTTP_STATUS_BAD_REQUEST).send({message: `Карточка с указанным id:${cardId} не найдена`});
     } else {next(err)}
   })
 };
