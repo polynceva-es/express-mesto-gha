@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const http2 = require('node:http2');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
+const BadRequestError = require('./errors/badRequestError');
+const NotFoundError = require('./errors/notFoundError');
 
 const { HTTP_STATUS_INTERNAL_SERVER_ERROR, HTTP_STATUS_NOT_FOUND } = http2.constants;
 
@@ -16,7 +18,11 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
 
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
 function errorHandler(err, req, res, next) {
-  res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: `Произошла ошибка: ${err.message}` });
+  if (err instanceof BadRequestError || err instanceof NotFoundError) {
+    res.status(err.statusCode).send({ message: err.message });
+  } else {
+    res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: `Произошла ошибка: ${err.message}` });
+  }
 }
 
 app.use(bodyParser.json());
