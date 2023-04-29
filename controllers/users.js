@@ -5,6 +5,7 @@ const { Joi } = require('celebrate');
 const http2 = require('node:http2');
 const User = require('../models/user');
 const getSecretKey = require('../utils/secretKey');
+const { joiIsUrlValid } = require('../utils/isUrlValid');
 
 const { HTTP_STATUS_CREATED, HTTP_STATUS_OK } = http2.constants;
 const BadRequestError = require('../errors/badRequestError');
@@ -15,7 +16,7 @@ const UnauthorisedError = require('../errors/unauthorisedError');
 module.exports.celebrateParams = {
   name: Joi.string().min(2).max(30),
   about: Joi.string().min(2).max(30),
-  avatar: Joi.string().uri({ scheme: ['http', 'https'] }),
+  avatar: Joi.string().custom(joiIsUrlValid),
   email: Joi.string().required().email(),
   password: Joi.string().required(),
 };

@@ -27,6 +27,7 @@ module.exports.postCards = (req, res, next) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
+        console.log(err);
         next(new BadRequestError('Переданы некорректные данные при создании карточки'));
       } else { next(err); }
     });
@@ -37,7 +38,6 @@ module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   Card.findById(cardId)
     .then((card) => {
-      console.log(card);
       if (!card) {
         throw new NotFoundError(`Карточка с указанным id:${cardId} не найдена`);
       } else if (card.owner.valueOf() === userId) {

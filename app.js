@@ -32,11 +32,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
 
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
 function errorHandler(err, req, res, next) {
-  if (err instanceof BadRequestError
-    || err instanceof NotFoundError
-    || err instanceof ConflictError
-    || err instanceof UnauthorisedError
-    || err instanceof ForbiddenError) {
+  if (err.statusCode) {
     res.status(err.statusCode).send({ message: err.message });
   } else {
     res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: `Произошла ошибка: ${err.message}` });
@@ -56,7 +52,7 @@ app.post('/signup', celebrate({
 }), createUser);
 app.use('/users', auth, usersRouter);
 app.use('/cards', auth, cardsRouter);
-app.use('*', (req, res) => { res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Страница не найдена' }); });
+app.use('*', (req, res, next) => { next(new NotFoundError('Страница не найдена')); });
 app.use(errors());
 app.use(errorHandler);
 

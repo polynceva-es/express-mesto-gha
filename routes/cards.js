@@ -7,6 +7,7 @@ const {
   putCardLike,
   deleteCardLike,
 } = require('../controllers/cards');
+const { joiIsUrlValid } = require('../utils/isUrlValid');
 
 cardsRouter.get('/', getCards);
 cardsRouter.post('/', celebrate({
@@ -16,22 +17,22 @@ cardsRouter.post('/', celebrate({
       .required()
       .min(2)
       .max(30),
-    link: Joi.string().uri({ scheme: ['http', 'https'] }).required(),
+    link: Joi.string().required().custom(joiIsUrlValid),
   }),
 }), postCards);
 cardsRouter.delete('/:cardId', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().hex().length(24),
+    cardId: Joi.string().hex().length(24).required(),
   }),
 }), deleteCard);
 cardsRouter.put('/:cardId/likes', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().hex().length(24),
+    cardId: Joi.string().hex().length(24).required(),
   }),
 }), putCardLike);
 cardsRouter.delete('/:cardId/likes', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().hex().length(24),
+    cardId: Joi.string().hex().length(24).required(),
   }),
 }), deleteCardLike);
 
