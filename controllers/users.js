@@ -1,10 +1,12 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 const http2 = require('node:http2');
 const User = require('../models/user');
 
 const { HTTP_STATUS_CREATED } = http2.constants;
 const BadRequestError = require('../errors/badRequestError');
 const NotFoundError = require('../errors/notFoundError');
+const ConflictError = require('../errors/conflictError');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -15,13 +17,30 @@ module.exports.getUsers = (req, res, next) => {
 };
 
 module.exports.postUsers = (req, res, next) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((user) => res.status(HTTP_STATUS_CREATED).send(user))
-    .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
-      } else { next(err); }
+  const {
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  } = req.body;
+  bcrypt.hash(password, 10)
+    .then((hash) => {
+      User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
+      })
+        .then((user) => res.status(HTTP_STATUS_CREATED).send(user))
+        .catch((err) => {
+          if (err instanceof mongoose.Error.ValidationError) {
+            next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
+          } else if (err.code === 11000) {
+            next(new ConflictError('Пользователь с таким email уже существует'));
+          } else { next(err); }
+        });
     });
 };
 

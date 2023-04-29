@@ -6,6 +6,7 @@ const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const BadRequestError = require('./errors/badRequestError');
 const NotFoundError = require('./errors/notFoundError');
+const ConflictError = require('./errors/conflictError');
 
 const { HTTP_STATUS_INTERNAL_SERVER_ERROR, HTTP_STATUS_NOT_FOUND } = http2.constants;
 
@@ -18,7 +19,9 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
 
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
 function errorHandler(err, req, res, next) {
-  if (err instanceof BadRequestError || err instanceof NotFoundError) {
+  if (err instanceof BadRequestError
+    || err instanceof NotFoundError
+    || err instanceof ConflictError) {
     res.status(err.statusCode).send({ message: err.message });
   } else {
     res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: `Произошла ошибка: ${err.message}` });
