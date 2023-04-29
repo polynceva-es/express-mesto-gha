@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { Joi } = require('celebrate');
 const http2 = require('node:http2');
 const User = require('../models/user');
 const getSecretKey = require('../utils/secretKey');
@@ -10,6 +11,14 @@ const BadRequestError = require('../errors/badRequestError');
 const NotFoundError = require('../errors/notFoundError');
 const ConflictError = require('../errors/conflictError');
 const UnauthorisedError = require('../errors/unauthorisedError');
+
+module.exports.celebrateParams = {
+  name: Joi.string().alphanum().min(2).max(30),
+  about: Joi.string().alphanum().min(2).max(30),
+  avatar: Joi.string().uri({ scheme: ['http', 'https'] }),
+  email: Joi.string().required().email(),
+  password: Joi.string().required(),
+};
 
 const getUserById = (userId, req, res, next) => {
   User.findById(userId)
