@@ -27,7 +27,6 @@ module.exports.postCards = (req, res, next) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        console.log(err);
         next(new BadRequestError('Переданы некорректные данные при создании карточки'));
       } else { next(err); }
     });
@@ -41,15 +40,16 @@ module.exports.deleteCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError(`Карточка с указанным id:${cardId} не найдена`);
       } else if (card.owner.valueOf() === userId) {
-        Card.findByIdAndRemove(cardId)
-          .then(res.send({ message: 'Пост удалён' }));
+        card.deleteOne()
+          .then(res.send({ message: 'Пост удалён' }))
+          .catch((err) => next(err));
       } else {
         throw new ForbiddenError('Вы не являетесь владельцем карточки');
       }
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        next(new BadRequestError(`Карточка с указанным id:${cardId} не найдена`));
+        next(new BadRequestError(`Передан некорректный id:${cardId}`));
       } else { next(err); }
     });
 };
@@ -69,7 +69,7 @@ module.exports.putCardLike = (req, res, next) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        next(new BadRequestError(`Карточка с указанным id:${cardId} не найдена`));
+        next(new BadRequestError(`Передан некорректный id:${cardId}`));
       } else { next(err); }
     });
 };
@@ -89,7 +89,7 @@ module.exports.deleteCardLike = (req, res, next) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        next(new BadRequestError(`Карточка с указанным id:${cardId} не найдена`));
+        next(new BadRequestError(`Передан некорректный id:${cardId}`));
       } else { next(err); }
     });
 };

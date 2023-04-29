@@ -11,7 +11,6 @@ const { HTTP_STATUS_CREATED, HTTP_STATUS_OK } = http2.constants;
 const BadRequestError = require('../errors/badRequestError');
 const NotFoundError = require('../errors/notFoundError');
 const ConflictError = require('../errors/conflictError');
-const UnauthorisedError = require('../errors/unauthorisedError');
 
 module.exports.celebrateParams = {
   name: Joi.string().min(2).max(30),
@@ -62,15 +61,13 @@ module.exports.createUser = (req, res, next) => {
         email,
         password: hash,
       })
-        .then((user) => res
-          .status(HTTP_STATUS_CREATED)
-          .send({
-            name,
-            about,
-            avatar,
-            email: user.email,
-            _id: user._id,
-          }))
+        .then((user) => {
+          const userObj = user.toObject();
+          delete userObj.password;
+          res
+            .status(HTTP_STATUS_CREATED)
+            .send(userObj);
+        })
         .catch((err) => {
           if (err instanceof mongoose.Error.ValidationError) {
             next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
@@ -88,8 +85,8 @@ module.exports.login = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, getSecretKey(), { expiresIn: '7d' });
       res.status(HTTP_STATUS_OK).send({ token });
     })
-    .catch(() => {
-      next(new UnauthorisedError('Неправильные почта или пароль'));
+    .catch((err) => {
+      next(err);
     });
 };
 
@@ -117,9 +114,6 @@ module.exports.updateUserInfo = (req, res, next) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequestError('Переданы некорректные данные при обновлении профиля'));
-      }
-      if (err instanceof mongoose.Error.CastError) {
-        next(new BadRequestError(`Пользователь по указанному id:${id} не найден`));
       } else { next(err); }
     });
 };
@@ -138,9 +132,6 @@ module.exports.updateUserAvatar = (req, res, next) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequestError('Переданы некорректные данные при обновлении аватара'));
-      }
-      if (err instanceof mongoose.Error.CastError) {
-        next(new BadRequestError(`Пользователь по указанному id:${id} не найден`));
       } else { next(err); }
     });
 };

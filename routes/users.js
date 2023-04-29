@@ -24,11 +24,11 @@ usersRouter.get('/:userId', celebrate({
 }), getUserId);
 usersRouter.patch('/me', celebrate({
   body: Joi.object().keys({
-    name, about,
+    name: name.required(), about: about.required(),
   }),
 }), updateUserInfo);
 usersRouter.patch('/me/avatar', celebrate({
-  body: Joi.object().keys({ avatar }),
+  body: Joi.object().keys({ avatar: avatar.required() }),
 }), updateUserAvatar);
 
 module.exports = usersRouter;
