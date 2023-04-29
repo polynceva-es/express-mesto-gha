@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const http2 = require('node:http2');
-const { Joi } = require('celebrate');
 const Card = require('../models/card');
 
 const { HTTP_STATUS_CREATED } = http2.constants;

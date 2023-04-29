@@ -61,7 +61,15 @@ module.exports.createUser = (req, res, next) => {
         email,
         password: hash,
       })
-        .then((user) => res.status(HTTP_STATUS_CREATED).send({ email: user.email, _id: user._id }))
+        .then((user) => res
+          .status(HTTP_STATUS_CREATED)
+          .send({
+            name,
+            about,
+            avatar,
+            email: user.email,
+            _id: user._id,
+          }))
         .catch((err) => {
           if (err instanceof mongoose.Error.ValidationError) {
             next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
