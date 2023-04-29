@@ -13,8 +13,8 @@ const ConflictError = require('../errors/conflictError');
 const UnauthorisedError = require('../errors/unauthorisedError');
 
 module.exports.celebrateParams = {
-  name: Joi.string().alphanum().min(2).max(30),
-  about: Joi.string().alphanum().min(2).max(30),
+  name: Joi.string().min(2).max(30),
+  about: Joi.string().min(2).max(30),
   avatar: Joi.string().uri({ scheme: ['http', 'https'] }),
   email: Joi.string().required().email(),
   password: Joi.string().required(),
