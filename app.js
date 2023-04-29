@@ -2,11 +2,14 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const http2 = require('node:http2');
+const { login, createUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const BadRequestError = require('./errors/badRequestError');
 const NotFoundError = require('./errors/notFoundError');
 const ConflictError = require('./errors/conflictError');
+const UnauthorisedError = require('./errors/unauthorisedError');
 
 const { HTTP_STATUS_INTERNAL_SERVER_ERROR, HTTP_STATUS_NOT_FOUND } = http2.constants;
 
@@ -21,7 +24,8 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
 function errorHandler(err, req, res, next) {
   if (err instanceof BadRequestError
     || err instanceof NotFoundError
-    || err instanceof ConflictError) {
+    || err instanceof ConflictError
+    || err instanceof UnauthorisedError) {
     res.status(err.statusCode).send({ message: err.message });
   } else {
     res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: `Произошла ошибка: ${err.message}` });
@@ -29,12 +33,10 @@ function errorHandler(err, req, res, next) {
 }
 
 app.use(bodyParser.json());
-app.use((req, res, next) => {
-  req.user = { _id: '643c00324990cc97aad60e3d' };
-  next();
-});
-app.use('/users', usersRouter);
-app.use('/cards', cardsRouter);
+app.post('/signin', login);
+app.post('/signup', createUser);
+app.use('/users', auth, usersRouter);
+app.use('/cards', auth, cardsRouter);
 app.use('*', (req, res) => { res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Страница не найдена' }); });
 app.use(errorHandler);
 
