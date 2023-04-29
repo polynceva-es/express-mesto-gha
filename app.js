@@ -7,11 +7,7 @@ const { login, createUser, celebrateParams } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
-const BadRequestError = require('./errors/badRequestError');
 const NotFoundError = require('./errors/notFoundError');
-const ConflictError = require('./errors/conflictError');
-const UnauthorisedError = require('./errors/unauthorisedError');
-const ForbiddenError = require('./errors/forbiddenError');
 
 const {
   name,
@@ -21,7 +17,7 @@ const {
   password,
 } = celebrateParams;
 
-const { HTTP_STATUS_INTERNAL_SERVER_ERROR, HTTP_STATUS_NOT_FOUND } = http2.constants;
+const { HTTP_STATUS_INTERNAL_SERVER_ERROR } = http2.constants;
 
 const app = express();
 const { PORT = 3000 } = process.env;
