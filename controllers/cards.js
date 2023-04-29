@@ -5,6 +5,7 @@ const Card = require('../models/card');
 const { HTTP_STATUS_CREATED } = http2.constants;
 const BadRequestError = require('../errors/badRequestError');
 const NotFoundError = require('../errors/notFoundError');
+const ForbiddenError = require('../errors/forbiddenError');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -32,14 +33,18 @@ module.exports.postCards = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  const owner = req.user._id;
+  const userId = req.user._id;
   const { cardId } = req.params;
-  Card.findOneAndRemove({ owner, _id: cardId })
+  Card.findById(cardId)
     .then((card) => {
-      if (card) {
-        res.send({ message: 'Пост удалён' });
-      } else {
+      console.log(card);
+      if (!card) {
         throw new NotFoundError(`Карточка с указанным id:${cardId} не найдена`);
+      } else if (card.owner.valueOf() === userId) {
+        Card.findByIdAndRemove(cardId)
+          .then(res.send({ message: 'Пост удалён' }));
+      } else {
+        throw new ForbiddenError('Вы не являетесь владельцем карточки');
       }
     })
     .catch((err) => {

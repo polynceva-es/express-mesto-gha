@@ -11,6 +11,7 @@ const BadRequestError = require('./errors/badRequestError');
 const NotFoundError = require('./errors/notFoundError');
 const ConflictError = require('./errors/conflictError');
 const UnauthorisedError = require('./errors/unauthorisedError');
+const ForbiddenError = require('./errors/forbiddenError');
 
 const {
   name,
@@ -34,7 +35,8 @@ function errorHandler(err, req, res, next) {
   if (err instanceof BadRequestError
     || err instanceof NotFoundError
     || err instanceof ConflictError
-    || err instanceof UnauthorisedError) {
+    || err instanceof UnauthorisedError
+    || err instanceof ForbiddenError) {
     res.status(err.statusCode).send({ message: err.message });
   } else {
     res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: `Произошла ошибка: ${err.message}` });
