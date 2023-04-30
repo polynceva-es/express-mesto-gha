@@ -36,6 +36,23 @@ const getUserById = (userId, req, res, next) => {
     });
 };
 
+const updateUser = (params, req, res, next) => {
+  const id = req.user._id;
+  User.findByIdAndUpdate(id, params, { new: true, runValidators: true })
+    .then((user) => {
+      if (user) {
+        res.send(user);
+      } else {
+        throw new NotFoundError(`Пользователь по указанному id:${id} не найден`);
+      }
+    })
+    .catch((err) => {
+      if (err instanceof mongoose.Error.ValidationError) {
+        next(new BadRequestError('Переданы некорректные данные при обновлении профиля'));
+      } else { next(err); }
+    });
+};
+
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => {
@@ -101,37 +118,11 @@ module.exports.getUserInfo = (req, res, next) => {
 };
 
 module.exports.updateUserInfo = (req, res, next) => {
-  const id = req.user._id;
   const { name, about } = req.body;
-  User.findByIdAndUpdate(id, { name, about }, { new: true, runValidators: true })
-    .then((user) => {
-      if (user) {
-        res.send(user);
-      } else {
-        throw new NotFoundError(`Пользователь по указанному id:${id} не найден`);
-      }
-    })
-    .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        next(new BadRequestError('Переданы некорректные данные при обновлении профиля'));
-      } else { next(err); }
-    });
+  updateUser({ name, about }, req, res, next);
 };
 
 module.exports.updateUserAvatar = (req, res, next) => {
-  const id = req.user._id;
   const { avatar } = req.body;
-  User.findByIdAndUpdate(id, { avatar }, { new: true, runValidators: true })
-    .then((user) => {
-      if (user) {
-        res.send(user);
-      } else {
-        throw new NotFoundError(`Пользователь по указанному id:${id} не найден`);
-      }
-    })
-    .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        next(new BadRequestError('Переданы некорректные данные при обновлении аватара'));
-      } else { next(err); }
-    });
+  updateUser({ avatar }, req, res, next);
 };
